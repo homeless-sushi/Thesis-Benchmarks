@@ -1,6 +1,8 @@
 #ifndef HMLSS_BFS
 #define HMLSS_BFS
 
+#include "HMLSS_BFS/BFSKnobs.h"
+
 #include <vector>
 
 #include "HMLSS_Graph/Graph.h"
@@ -9,16 +11,20 @@ namespace BFS
 {
     struct BFSResult
     {
+            Graph::Graph& graph;
             unsigned int source;
             int currentCost;
-            
-            std::vector<int> costs;
 
-            BFSResult(unsigned int nVertices, unsigned int source);
+            BFSResult(Graph::Graph& graph, unsigned int source);
+            virtual ~BFSResult();
+
+            virtual bool kernel(BFSKnobs::Knobs knobs);
+
+            virtual const std::vector<int>& costs() const;
+
+        private:
+            std::vector<int> costs_;
     };
-
-    //void BFSMigrateCPUtoGPU(Graph::Graph& graph, BFS::BFSResult& bfs);
-    //void BFSMigrateGPUtoCPU(Graph::Graph& graph, BFS::BFSResult& bfs);
-}
+ }
 
 #endif //HMLSS_BFS

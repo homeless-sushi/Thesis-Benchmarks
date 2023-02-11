@@ -2,8 +2,7 @@
 add_library(HMLSS_BFS STATIC
     "src/BFS.cc"
     "src/BFSKnobs.cc"
-    "src/BFSUtils.cc"
-    "src/BFS_OMP.cc")
+    "src/BFSUtils.cc")
 
 #Add to the include path
 target_include_directories(HMLSS_BFS PUBLIC "include")

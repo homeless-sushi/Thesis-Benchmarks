@@ -20,7 +20,7 @@ namespace BFSUtils
             return -1;
         }
 
-        for (int cost : bfs.costs){
+        for (int cost : bfs.costs()){
             resultFile << cost << std::endl;
         }
 

@@ -1,13 +1,12 @@
-#include <string>
-
 #include <iostream>
+#include <string>
+#include <memory>
 
 #include "HMLSS_Graph/Graph.h"
 #include "HMLSS_Graph/GraphUtils.h"
 #include "HMLSS_BFS/BFS.h"
 #include "HMLSS_BFS/BFSKnobs.h"
 #include "HMLSS_BFS/BFSUtils.h"
-#include "HMLSS_BFS/BFS_OMP.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,7 +19,7 @@ int main(int argc, char *argv[])
     std::string inputFileURL(argv[1]);
     Graph::Graph graph;
     GraphUtils::ReadGraphFile(inputFileURL, graph);
-    BFS::BFSResult bfs(graph.nVertices, 0);
+    BFS::BFSResult bfs = BFS::BFSResult(graph, 0);
     //connect_to_monitor
         //get initial resources
     BFSKnobs::Knobs currKnobsSetting = BFSKnobs::Knobs();
@@ -40,7 +39,7 @@ int main(int argc, char *argv[])
         }
 
         if(currKnobsSetting.device == BFSKnobs::DEVICE::CPU){
-            done = BFS::BFSOMPKernel(graph, bfs, currKnobsSetting.cpuKnobs.nThreads);
+            done = bfs.kernel(currKnobsSetting);
         }
         //if(currKnobsSetting.device == Knobs::DEVICE::GPU){
         //
