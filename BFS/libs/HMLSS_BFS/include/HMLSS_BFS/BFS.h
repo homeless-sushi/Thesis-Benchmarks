@@ -10,12 +10,9 @@ namespace BFS
     struct BFSResult
     {
             unsigned int source;
-
-            std::vector<bool> visited;
+            int currentCost;
+            
             std::vector<int> costs;
-
-            std::vector<bool> frontier;
-            std::vector<bool> nextFrontier;
 
             BFSResult(unsigned int nVertices, unsigned int source);
     };

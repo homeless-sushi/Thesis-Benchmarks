@@ -13,26 +13,21 @@ namespace BFS
 
         #pragma omp parallel for \
         num_threads(nThreads)
-        for(int vertexId = 0; vertexId < graph.nVertices; vertexId++){
-            if (bfs.frontier[vertexId]){
-                const int currCost = bfs.costs[vertexId];
-                const int nodeEdgesStart = graph.edgeOffsets[vertexId];
-                const int nodeEdgesStop = graph.edgeOffsets[vertexId+1];
+        for(int fromNode = 0; fromNode < graph.nVertices; fromNode++){
+            if (bfs.costs[fromNode] == bfs.currentCost){
+                const int nodeEdgesStart = graph.edgeOffsets[fromNode];
+                const int nodeEdgesStop = graph.edgeOffsets[fromNode+1];
                 for(int edgeId = nodeEdgesStart; edgeId < nodeEdgesStop; edgeId++){
-                    const int destinationvertexId = graph.edges[edgeId];
-                    if(!bfs.visited[destinationvertexId]){
-                        bfs.visited[destinationvertexId]=true;
-                        bfs.costs[destinationvertexId]=currCost+1;
-                        bfs.nextFrontier[destinationvertexId]=true;
+                    const int toNode = graph.edges[edgeId];
+                    if(bfs.costs[toNode] == -1){
+                        bfs.costs[toNode]=bfs.currentCost+1;
                         done=false;
                     }
                 }
             }
         }
 
-        bfs.frontier.swap(bfs.nextFrontier);
-        std::fill(bfs.nextFrontier.begin(), bfs.nextFrontier.end(), false);
-
+        bfs.currentCost++;
         return done;
     }
 }
