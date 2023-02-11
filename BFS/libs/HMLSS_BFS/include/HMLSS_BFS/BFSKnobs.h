@@ -1,7 +1,7 @@
-#ifndef HMLSS_KNOBS
-#define HMLSS_KNOBS
+#ifndef HMLSS_BFS_KNOBS
+#define HMLSS_BFS_KNOBS
 
-namespace Knobs 
+namespace BFSKnobs 
 {
     enum DEVICE 
     {
@@ -36,4 +36,4 @@ namespace Knobs
     };
 }
 
-#endif //HMLSS_KNOBS
+#endif //HMLSS_BFS_KNOBS

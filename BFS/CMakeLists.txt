@@ -10,7 +10,7 @@ endif()
 project(BFSApp)
 
 #When the project is built, create this library
-set(APP_SOURCES "src/main.cc" "src/knobs.cc")
+set(APP_SOURCES "src/main.cc")
 add_executable(BFSApp ${APP_SOURCES})
 
 target_include_directories(BFSApp PUBLIC "include")

@@ -1,6 +1,7 @@
 #When the project is built, create this library
 add_library(HMLSS_BFS STATIC
     "src/BFS.cc"
+    "src/BFSKnobs.cc"
     "src/BFSUtils.cc"
     "src/BFS_OMP.cc")
 
