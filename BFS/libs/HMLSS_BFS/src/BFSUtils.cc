@@ -12,7 +12,7 @@
 
 namespace BFSUtils
 {
-    int WriteGraphResultFile(std::string fileURL, const BFS::BFSResult& bfs)
+    int WriteGraphResultFile(std::string fileURL, BFS::BFSResult& bfs)
     {
 	    std::ofstream resultFile (fileURL);
         if (!resultFile.is_open()){

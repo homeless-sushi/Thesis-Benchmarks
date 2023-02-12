@@ -17,10 +17,10 @@ namespace BFS
 
             BFSResult(Graph::Graph& graph, unsigned int source);
             virtual ~BFSResult();
-
+            
             virtual bool kernel(BFSKnobs::Knobs knobs);
 
-            virtual const std::vector<int>& costs() const;
+            virtual const std::vector<int>& costs();
 
         private:
             std::vector<int> costs_;

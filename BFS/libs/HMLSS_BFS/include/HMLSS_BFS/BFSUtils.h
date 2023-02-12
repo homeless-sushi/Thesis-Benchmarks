@@ -9,7 +9,7 @@
 
 namespace BFSUtils
 {
-    int WriteGraphResultFile(std::string fileURL, const BFS::BFSResult& bfs);
+    int WriteGraphResultFile(std::string fileURL, BFS::BFSResult& bfs);
 }
 
 #endif //HMLSS_BFS_UTILS

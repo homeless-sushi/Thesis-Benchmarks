@@ -17,7 +17,7 @@ namespace BFS
     
     BFSResult::~BFSResult() = default;
 
-    const std::vector<int>& BFSResult::costs() const { return costs_; }
+    const std::vector<int>& BFSResult::costs() { return costs_; }
 
     bool BFSResult::kernel(BFSKnobs::Knobs knobs) 
     {
