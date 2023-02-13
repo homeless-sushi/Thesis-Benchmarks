@@ -7,7 +7,14 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 #Project name
-project(BFSApp)
+project(
+    BFSApp
+    LANGUAGES CUDA CXX)
+
+#Enable debug with cuda-gdb
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G") 
+endif()
 
 #When the project is built, create this library
 set(APP_SOURCES "src/main.cc")

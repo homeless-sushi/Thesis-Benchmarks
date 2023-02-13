@@ -2,7 +2,8 @@
 add_library(HMLSS_BFS STATIC
     "src/BFS.cc"
     "src/BFSKnobs.cc"
-    "src/BFSUtils.cc")
+    "src/BFSUtils.cc"
+    "src/BFS_CUDA.cu")
 
 #Add to the include path
 target_include_directories(HMLSS_BFS PUBLIC "include")

@@ -7,6 +7,9 @@
 #include "HMLSS_BFS/BFS.h"
 #include "HMLSS_BFS/BFSKnobs.h"
 #include "HMLSS_BFS/BFSUtils.h"
+#include "HMLSS_BFS/BFS_CUDA.h"
+
+BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFSKnobs::Knobs prevKnobs, BFSKnobs::Knobs currKnobs);
 
 int main(int argc, char *argv[])
 {
@@ -19,34 +22,36 @@ int main(int argc, char *argv[])
     std::string inputFileURL(argv[1]);
     Graph::Graph graph;
     GraphUtils::ReadGraphFile(inputFileURL, graph);
-    BFS::BFSResult bfs = BFS::BFSResult(graph, 0);
-    //connect_to_monitor
-        //get initial resources
-    BFSKnobs::Knobs currKnobsSetting = BFSKnobs::Knobs();
-    bool done = false;
-    while(!done){
-        done = true;
-        BFSKnobs::Knobs prevKnobsSetting = currKnobsSetting;
+    BFSKnobs::Knobs currKnobs = BFSKnobs::Knobs();
+    BFS::BFSResult* bfs = new BFS::BFSResult(graph, 0);
+    while(true){
+        BFSKnobs::Knobs prevKnobs = currKnobs;
+        currKnobs = BFSKnobs::Knobs(BFSKnobs::GPUKnobs());
         //get knobs from monitor
         //get knobs from margot
-        if(currKnobsSetting.device != prevKnobsSetting.device){
-            if(currKnobsSetting.device == BFSKnobs::DEVICE::CPU){
-                //TODO
-            }
-            if(currKnobsSetting.device == BFSKnobs::DEVICE::GPU){
-                //TODO
-            }
-        }
-
-        if(currKnobsSetting.device == BFSKnobs::DEVICE::CPU){
-            done = bfs.kernel(currKnobsSetting);
-        }
-        //if(currKnobsSetting.device == Knobs::DEVICE::GPU){
-        //
-        //}
+        bfs = migrate(bfs, prevKnobs, currKnobs);
+        if(bfs->kernel(currKnobs))
+            break;
     }
 
     if(argc == 3){
-        BFSUtils::WriteGraphResultFile(argv[2], bfs);
+        BFSUtils::WriteGraphResultFile(argv[2], *bfs);
+    }
+
+    free(bfs);
+}
+
+BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFSKnobs::Knobs prevKnobs, BFSKnobs::Knobs currKnobs)
+{
+    if(prevKnobs.device == currKnobs.device)
+        return bfs;
+    
+    switch (currKnobs.device) 
+    {
+        case BFSKnobs::Knobs::DEVICE::GPU :
+            return new BFS::BFSCUDA(bfs->graph, bfs->source);
+
+        default :
+            return new BFS::BFSResult(bfs->graph, bfs->source);
     }
 }
