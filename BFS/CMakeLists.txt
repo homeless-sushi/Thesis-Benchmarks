@@ -13,8 +13,12 @@ project(
 
 #Enable debug with cuda-gdb
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G") 
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -g -G") 
 endif()
+
+#Enable OpenMP on NVCC
+#set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 
 #When the project is built, create this library
 set(APP_SOURCES "src/main.cc")

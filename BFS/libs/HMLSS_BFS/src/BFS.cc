@@ -1,5 +1,7 @@
 #include "HMLSS_BFS/BFS.h"
 
+#include <iostream>
+
 #include <omp.h>
 
 #include "HMLSS_Graph/Graph.h"
@@ -36,7 +38,7 @@ namespace BFS
         bool done = true;
 
         #pragma omp parallel for \
-        num_threads(nThreads)
+        num_threads(knobs.cpuKnobs.nThreads)
         for(int fromNode = 0; fromNode < graph.nVertices; fromNode++){
             if (costs_[fromNode] == currentCost){
                 const int nodeEdgesStart = graph.edgeOffsets[fromNode];
