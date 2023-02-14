@@ -27,8 +27,30 @@ namespace BFS
         cudaMemset(doneDevice_, true, sizeof(bool));
     }
 
+    BFSCUDA::BFSCUDA(
+        Graph::Graph& graph,
+        unsigned int source,
+        int currentCost,
+        std::vector<int> costs) :
+        BFSResult(graph, source)
+    {
+        this->currentCost = currentCost;
+
+        cudaMalloc(&edgeOffsetsDevice_, sizeof(unsigned int)*graph.edgeOffsets.size());
+        cudaMemcpy(edgeOffsetsDevice_, graph.edgeOffsets.data(), sizeof(unsigned int)*graph.edgeOffsets.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
+
+        cudaMalloc(&edgesDevice_, sizeof(unsigned int)*graph.edges.size());
+        cudaMemcpy(edgesDevice_, graph.edges.data(), sizeof(unsigned int)*graph.edges.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
+
+        cudaMalloc(&costsDevice_, sizeof(int)*costs.size());
+        cudaMemcpy(costsDevice_, costs.data(), sizeof(int)*costs.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
+
+        cudaMalloc(&doneDevice_, sizeof(bool));
+        cudaMemset(doneDevice_, true, sizeof(bool));
+    }
+
     BFSCUDA::BFSCUDA(BFSResult bfsCPU) :
-        BFSCUDA(bfsCPU.graph, bfsCPU.source)
+        BFSCUDA(bfsCPU.graph, bfsCPU.source, bfsCPU.currentCost, bfsCPU.costs())
     {}
 
     BFSCUDA::~BFSCUDA() 

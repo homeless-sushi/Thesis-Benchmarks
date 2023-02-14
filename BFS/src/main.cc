@@ -11,6 +11,8 @@
 
 BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFSKnobs::Knobs prevKnobs, BFSKnobs::Knobs currKnobs);
 
+BFSKnobs::Knobs getKnobs(BFSKnobs::Knobs prevKnobs);
+
 int main(int argc, char *argv[])
 {
     if(argc < 2){
@@ -26,7 +28,7 @@ int main(int argc, char *argv[])
     BFS::BFSResult* bfs = new BFS::BFSResult(graph, 0);
     while(true){
         BFSKnobs::Knobs prevKnobs = currKnobs;
-        currKnobs = BFSKnobs::Knobs(BFSKnobs::GPUKnobs());
+        currKnobs = getKnobs(prevKnobs);
         //get knobs from monitor
         //get knobs from margot
         bfs = migrate(bfs, prevKnobs, currKnobs);
@@ -46,12 +48,28 @@ BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFSKnobs::Knobs prevKnobs, BFSKnobs
     if(prevKnobs.device == currKnobs.device)
         return bfs;
     
+    BFS::BFSResult* newBFS;
     switch (currKnobs.device) 
     {
         case BFSKnobs::Knobs::DEVICE::GPU :
-            return new BFS::BFSCUDA(bfs->graph, bfs->source);
+            newBFS = new BFS::BFSCUDA(bfs->graph, bfs->source, bfs->currentCost, bfs->costs());
+            break;
 
         default :
-            return new BFS::BFSResult(bfs->graph, bfs->source);
+            newBFS = new BFS::BFSResult(bfs->graph, bfs->source, bfs->currentCost, bfs->costs());
+    }
+    delete bfs;
+    return newBFS;
+}
+
+BFSKnobs::Knobs getKnobs(BFSKnobs::Knobs prevKnobs)
+{
+    switch (prevKnobs.device) 
+    {
+        case BFSKnobs::Knobs::DEVICE::GPU :
+            return BFSKnobs::Knobs();
+
+        default :
+            return BFSKnobs::Knobs(BFSKnobs::GPUKnobs());
     }
 }

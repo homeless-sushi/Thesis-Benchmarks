@@ -14,6 +14,18 @@ namespace BFS
     {
         costs_[source] = 0;
     }
+
+    BFSResult::BFSResult(
+        Graph::Graph& graph,
+        unsigned int source,
+        int currentCost,
+        std::vector<int> costs) :
+        graph(graph),
+        source{source},
+        currentCost{currentCost}
+    {
+        costs_ = costs;
+    }
     
     BFSResult::~BFSResult() = default;
 

@@ -16,6 +16,11 @@ namespace BFS
             int currentCost;
 
             BFSResult(Graph::Graph& graph, unsigned int source);
+            BFSResult(
+                Graph::Graph& graph,
+                unsigned int source,
+                int currentCost,
+                std::vector<int> costs);
             virtual ~BFSResult();
             
             virtual bool kernel(BFSKnobs::Knobs knobs);

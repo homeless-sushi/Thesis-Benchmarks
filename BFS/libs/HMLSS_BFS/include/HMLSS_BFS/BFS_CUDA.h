@@ -13,8 +13,14 @@ namespace BFS
     struct BFSCUDA : public BFSResult
     {
             BFSCUDA(Graph::Graph& graph, unsigned int source);
+            BFSCUDA(
+                Graph::Graph& graph,
+                unsigned int source,
+                int currentCost,
+                std::vector<int> costs);
             BFSCUDA(BFSResult bfsCPU);
             virtual ~BFSCUDA() override;
+
             virtual bool kernel(BFSKnobs::Knobs knobs) override;
             const std::vector<int>& costs();
 
