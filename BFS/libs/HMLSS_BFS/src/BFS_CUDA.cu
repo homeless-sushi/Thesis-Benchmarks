@@ -13,11 +13,11 @@ namespace BFS
     BFSCUDA::BFSCUDA(Graph::Graph& graph, unsigned int source) :
         BFSResult(graph, source)
     {
-        cudaMalloc(&edgeOffsetsDevice_, sizeof(unsigned int)*graph.edgeOffsets.capacity());
-        cudaMemcpy(edgeOffsetsDevice_, graph.edgeOffsets.data(), sizeof(unsigned int)*graph.edgeOffsets.capacity(), cudaMemcpyKind::cudaMemcpyHostToDevice);
+        cudaMalloc(&edgeOffsetsDevice_, sizeof(unsigned int)*graph.edgeOffsets.size());
+        cudaMemcpy(edgeOffsetsDevice_, graph.edgeOffsets.data(), sizeof(unsigned int)*graph.edgeOffsets.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
 
-        cudaMalloc(&edgesDevice_, sizeof(unsigned int)*graph.edges.capacity());
-        cudaMemcpy(edgesDevice_, graph.edges.data(), sizeof(unsigned int)*graph.edges.capacity(), cudaMemcpyKind::cudaMemcpyHostToDevice);
+        cudaMalloc(&edgesDevice_, sizeof(unsigned int)*graph.edges.size());
+        cudaMemcpy(edgesDevice_, graph.edges.data(), sizeof(unsigned int)*graph.edges.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
 
         cudaMalloc(&costsDevice_, sizeof(int)*graph.nVertices);
         cudaMemset(costsDevice_, -1, sizeof(unsigned int)*graph.nVertices);

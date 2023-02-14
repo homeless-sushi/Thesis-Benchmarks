@@ -25,20 +25,20 @@ namespace GraphUtils
         firstLineStream >> nEdges;
         graph = Graph::Graph(nVertices, nEdges);
         
-        unsigned int vertexId = 0;
         unsigned int nEdgesRead = 0;
-        graph.edgeOffsets[vertexId] = nEdgesRead;
+        graph.edgeOffsets.push_back(nEdgesRead);
         while(graphFile.good()){
 
             getline(graphFile, lineString);
             std::istringstream lineStream(lineString);
             while(lineStream.good()){
-                lineStream >> graph.edges[nEdgesRead];
+                unsigned int destinationVertex;
+                lineStream >> destinationVertex;
+                graph.edges.push_back(destinationVertex);
                 ++nEdgesRead;
             }
 
-            ++vertexId;
-            graph.edgeOffsets[vertexId] = nEdgesRead;
+            graph.edgeOffsets.push_back(nEdgesRead);
         }
         graphFile.close();
         return 0;
