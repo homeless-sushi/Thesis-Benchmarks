@@ -8,6 +8,7 @@
 #include "HMLSS_BFS/BFSKnobs.h"
 #include "HMLSS_BFS/BFSUtils.h"
 #include "HMLSS_BFS/BFS_CUDA.h"
+#include "HMLSS_BFS/BFSFactory.h"
 
 BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFS::Knobs prevKnobs, BFS::Knobs currKnobs);
 
@@ -24,19 +25,14 @@ int main(int argc, char *argv[])
     std::string inputFileURL(argv[1]);
     Graph::Graph graph;
     GraphUtils::ReadGraphFile(inputFileURL, graph);
-    BFS::Knobs currKnobs = BFS::Knobs(BFS::GPUKnobs(
-        BFS::GPUKnobs::BLOCK_SIZE::BLOCK_32,
-        BFS::GPUKnobs::CHUNK_FACTOR::CHUNK_1,
-        BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY,
-        BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY
-    ));
-    BFS::BFSResult* bfs = new BFS::BFSCUDA(graph, 0);
+    BFS::Knobs currKnobs = BFS::Knobs();
+    BFS::BFSResult* bfs = BFS::buildBFS(currKnobs, graph, 0);
     while(true){
         BFS::Knobs prevKnobs = currKnobs;
         //currKnobs = getKnobs(prevKnobs);
         //get knobs from monitor
         //get knobs from margot
-        //bfs = migrate(bfs, prevKnobs, currKnobs);
+        bfs = migrate(bfs, prevKnobs, currKnobs);
         if(bfs->kernel(currKnobs))
             break;
     }
@@ -48,21 +44,12 @@ int main(int argc, char *argv[])
     free(bfs);
 }
 
-BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFS::Knobs prevKnobs, BFS::Knobs currKnobs)
+inline BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFS::Knobs prevKnobs, BFS::Knobs currKnobs)
 {
     if(prevKnobs.device == currKnobs.device)
         return bfs;
     
-    BFS::BFSResult* newBFS;
-    switch (currKnobs.device) 
-    {
-        case BFS::Knobs::DEVICE::GPU :
-            newBFS = new BFS::BFSCUDA(bfs->graph, bfs->source, bfs->currentCost, bfs->costs());
-            break;
-
-        default :
-            newBFS = new BFS::BFSResult(bfs->graph, bfs->source, bfs->currentCost, bfs->costs());
-    }
+    BFS::BFSResult* newBFS = BFS::buildBFS(currKnobs, bfs);
     delete bfs;
     return newBFS;
 }
