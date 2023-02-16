@@ -5,9 +5,15 @@ namespace BFSKnobs
     CPUKnobs::CPUKnobs() : nThreads(1) {}
     CPUKnobs::CPUKnobs(unsigned int nThreads) : nThreads(nThreads) {}
 
-    GPUKnobs::GPUKnobs(BLOCK_SIZE blockSize, CHUNK_FACTOR chunkFactor) :
+    GPUKnobs::GPUKnobs(
+        BLOCK_SIZE blockSize,
+        CHUNK_FACTOR chunkFactor,
+        MEMORY_TYPE edgeOffsets,
+        MEMORY_TYPE edges) :
         blockSize(blockSize),
-        chunkFactor(chunkFactor)
+        chunkFactor(chunkFactor),
+        edgeOffsets(edgeOffsets),
+        edges(edges)
     {}
 
     Knobs::Knobs() : 

@@ -24,14 +24,19 @@ int main(int argc, char *argv[])
     std::string inputFileURL(argv[1]);
     Graph::Graph graph;
     GraphUtils::ReadGraphFile(inputFileURL, graph);
-    BFSKnobs::Knobs currKnobs = BFSKnobs::Knobs();
-    BFS::BFSResult* bfs = new BFS::BFSResult(graph, 0);
+    BFSKnobs::Knobs currKnobs = BFSKnobs::Knobs(BFSKnobs::GPUKnobs(
+        BFSKnobs::GPUKnobs::BLOCK_SIZE::BLOCK_32,
+        BFSKnobs::GPUKnobs::CHUNK_FACTOR::CHUNK_1,
+        BFSKnobs::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY,
+        BFSKnobs::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY
+    ));
+    BFS::BFSResult* bfs = new BFS::BFSCUDA(graph, 0);
     while(true){
         BFSKnobs::Knobs prevKnobs = currKnobs;
-        currKnobs = getKnobs(prevKnobs);
+        //currKnobs = getKnobs(prevKnobs);
         //get knobs from monitor
         //get knobs from margot
-        bfs = migrate(bfs, prevKnobs, currKnobs);
+        //bfs = migrate(bfs, prevKnobs, currKnobs);
         if(bfs->kernel(currKnobs))
             break;
     }

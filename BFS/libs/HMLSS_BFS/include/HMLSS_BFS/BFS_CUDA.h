@@ -6,6 +6,8 @@
 
 #include <vector>
 
+#include "cuda_runtime_api.h"
+
 #include "HMLSS_Graph/Graph.h"
 
 namespace BFS
@@ -27,6 +29,8 @@ namespace BFS
         private:
             unsigned int* edgeOffsetsDevice_;
             unsigned int* edgesDevice_;
+            cudaTextureObject_t edgeOffsetsTexture_;
+            cudaTextureObject_t edgesTexture_;
             int* costsDevice_;
             bool* doneDevice_;
 

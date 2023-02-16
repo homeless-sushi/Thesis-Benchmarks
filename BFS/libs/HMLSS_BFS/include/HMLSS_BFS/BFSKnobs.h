@@ -33,7 +33,19 @@ namespace BFSKnobs
         };
         CHUNK_FACTOR chunkFactor;
 
-        GPUKnobs(BLOCK_SIZE blockSize = BLOCK_32, CHUNK_FACTOR chunkFactor = CHUNK_1);
+        enum MEMORY_TYPE
+        {
+            DEVICE_MEMORY = 0,
+            TEXTURE_MEMORY = 1
+        };
+        MEMORY_TYPE edgeOffsets;
+        MEMORY_TYPE edges;
+
+        GPUKnobs(
+            BLOCK_SIZE blockSize = BLOCK_32,
+            CHUNK_FACTOR chunkFactor = CHUNK_1, 
+            MEMORY_TYPE edgeOffsets = DEVICE_MEMORY,
+            MEMORY_TYPE edges = DEVICE_MEMORY);
     };
 
     struct Knobs
