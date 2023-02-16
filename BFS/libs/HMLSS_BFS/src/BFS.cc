@@ -33,7 +33,7 @@ namespace BFS
 
     const std::vector<int>& BFSResult::costs() { return costs_; }
 
-    bool BFSResult::kernel(BFSKnobs::Knobs knobs) 
+    bool BFSResult::kernel(BFS::Knobs knobs) 
     {
         bool done = true;
 

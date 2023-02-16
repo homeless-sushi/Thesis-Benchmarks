@@ -1,7 +1,7 @@
 #ifndef HMLSS_BFS_KNOBS
 #define HMLSS_BFS_KNOBS
 
-namespace BFSKnobs 
+namespace BFS 
 {
     struct CPUKnobs 
     {

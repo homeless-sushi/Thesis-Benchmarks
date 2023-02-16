@@ -94,8 +94,8 @@ namespace BFS
             unsigned int *edgesDevice,
             cudaTextureObject_t edgeOffsetsTexture,
             cudaTextureObject_t edgesTexture,
-            BFSKnobs::GPUKnobs::MEMORY_TYPE edgeOffsetsType,
-            BFSKnobs::GPUKnobs::MEMORY_TYPE edgesType,
+            BFS::GPUKnobs::MEMORY_TYPE edgeOffsetsType,
+            BFS::GPUKnobs::MEMORY_TYPE edgesType,
             int *costs,
             int currCost,
             bool *done)
@@ -108,7 +108,7 @@ namespace BFS
                     unsigned int nodeEdgesEnd;
                     switch (edgeOffsetsType)
                     {
-                        case BFSKnobs::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
+                        case BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
                             nodeEdgesStart = tex1Dfetch<unsigned int>(edgeOffsetsTexture, fromNode);
                             nodeEdgesEnd = tex1Dfetch<unsigned int>(edgeOffsetsTexture, fromNode+1);
                             break;
@@ -122,7 +122,7 @@ namespace BFS
                         unsigned int toNode;
                         switch (edgesType)
                         {
-                            case BFSKnobs::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
+                            case BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
                                 toNode = tex1Dfetch<unsigned int>(edgesTexture, i);
                                 break;
                             
@@ -140,13 +140,13 @@ namespace BFS
         }
     }
 
-    bool BFSCUDA::kernel(BFSKnobs::Knobs knobs)
+    bool BFSCUDA::kernel(BFS::Knobs knobs)
     {
         cudaMemset(doneDevice_, true, sizeof(bool));
 
-        if(knobs.gpuKnobs.edgeOffsets == BFSKnobs::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgeOffsetsTexture_ == 0)
+        if(knobs.gpuKnobs.edgeOffsets == BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgeOffsetsTexture_ == 0)
             createTextureObject(edgeOffsetsDevice_, &edgeOffsetsTexture_, graph.edgeOffsets.size());
-        if(knobs.gpuKnobs.edges == BFSKnobs::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgesTexture_ == 0)
+        if(knobs.gpuKnobs.edges == BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgesTexture_ == 0)
             createTextureObject(edgesDevice_, &edgesTexture_, graph.edges.size());
 
         const unsigned int blockDim = knobs.gpuKnobs.blockSize;

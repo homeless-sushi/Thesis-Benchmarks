@@ -9,9 +9,9 @@
 #include "HMLSS_BFS/BFSUtils.h"
 #include "HMLSS_BFS/BFS_CUDA.h"
 
-BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFSKnobs::Knobs prevKnobs, BFSKnobs::Knobs currKnobs);
+BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFS::Knobs prevKnobs, BFS::Knobs currKnobs);
 
-BFSKnobs::Knobs getKnobs(BFSKnobs::Knobs prevKnobs);
+BFS::Knobs getKnobs(BFS::Knobs prevKnobs);
 
 int main(int argc, char *argv[])
 {
@@ -24,15 +24,15 @@ int main(int argc, char *argv[])
     std::string inputFileURL(argv[1]);
     Graph::Graph graph;
     GraphUtils::ReadGraphFile(inputFileURL, graph);
-    BFSKnobs::Knobs currKnobs = BFSKnobs::Knobs(BFSKnobs::GPUKnobs(
-        BFSKnobs::GPUKnobs::BLOCK_SIZE::BLOCK_32,
-        BFSKnobs::GPUKnobs::CHUNK_FACTOR::CHUNK_1,
-        BFSKnobs::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY,
-        BFSKnobs::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY
+    BFS::Knobs currKnobs = BFS::Knobs(BFS::GPUKnobs(
+        BFS::GPUKnobs::BLOCK_SIZE::BLOCK_32,
+        BFS::GPUKnobs::CHUNK_FACTOR::CHUNK_1,
+        BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY,
+        BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY
     ));
     BFS::BFSResult* bfs = new BFS::BFSCUDA(graph, 0);
     while(true){
-        BFSKnobs::Knobs prevKnobs = currKnobs;
+        BFS::Knobs prevKnobs = currKnobs;
         //currKnobs = getKnobs(prevKnobs);
         //get knobs from monitor
         //get knobs from margot
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     free(bfs);
 }
 
-BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFSKnobs::Knobs prevKnobs, BFSKnobs::Knobs currKnobs)
+BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFS::Knobs prevKnobs, BFS::Knobs currKnobs)
 {
     if(prevKnobs.device == currKnobs.device)
         return bfs;
@@ -56,7 +56,7 @@ BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFSKnobs::Knobs prevKnobs, BFSKnobs
     BFS::BFSResult* newBFS;
     switch (currKnobs.device) 
     {
-        case BFSKnobs::Knobs::DEVICE::GPU :
+        case BFS::Knobs::DEVICE::GPU :
             newBFS = new BFS::BFSCUDA(bfs->graph, bfs->source, bfs->currentCost, bfs->costs());
             break;
 
@@ -67,14 +67,14 @@ BFS::BFSResult* migrate(BFS::BFSResult* bfs, BFSKnobs::Knobs prevKnobs, BFSKnobs
     return newBFS;
 }
 
-BFSKnobs::Knobs getKnobs(BFSKnobs::Knobs prevKnobs)
+BFS::Knobs getKnobs(BFS::Knobs prevKnobs)
 {
     switch (prevKnobs.device) 
     {
-        case BFSKnobs::Knobs::DEVICE::GPU :
-            return BFSKnobs::Knobs();
+        case BFS::Knobs::DEVICE::GPU :
+            return BFS::Knobs();
 
         default :
-            return BFSKnobs::Knobs(BFSKnobs::GPUKnobs());
+            return BFS::Knobs(BFS::GPUKnobs());
     }
 }

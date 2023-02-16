@@ -23,7 +23,7 @@ namespace BFS
             BFSCUDA(BFSResult bfsCPU);
             virtual ~BFSCUDA() override;
 
-            virtual bool kernel(BFSKnobs::Knobs knobs) override;
+            virtual bool kernel(BFS::Knobs knobs) override;
             const std::vector<int>& costs();
 
         private:

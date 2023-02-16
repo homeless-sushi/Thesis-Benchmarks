@@ -1,6 +1,6 @@
 #include "HMLSS_BFS/BFSKnobs.h"
 
-namespace BFSKnobs 
+namespace BFS 
 {
     CPUKnobs::CPUKnobs() : nThreads(1) {}
     CPUKnobs::CPUKnobs(unsigned int nThreads) : nThreads(nThreads) {}

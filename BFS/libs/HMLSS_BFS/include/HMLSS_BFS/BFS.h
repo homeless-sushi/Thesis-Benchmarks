@@ -23,7 +23,7 @@ namespace BFS
                 std::vector<int> costs);
             virtual ~BFSResult();
             
-            virtual bool kernel(BFSKnobs::Knobs knobs);
+            virtual bool kernel(BFS::Knobs knobs);
 
             virtual const std::vector<int>& costs();
 
