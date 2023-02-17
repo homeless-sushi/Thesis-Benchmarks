@@ -36,3 +36,9 @@ set(BFS_LIB "HMLSS_BFS")
 add_subdirectory("libs/${BFS_LIB}")
 target_link_libraries(BFSApp PUBLIC HMLSS_BFS)
 
+#Margot Heel
+find_package (margot_heel_generator REQUIRED)
+get_filename_component(MARGOT_JSON "margot/margot.json" ABSOLUTE)
+margot_heel_generate_interface("${MARGOT_JSON}")
+target_link_libraries(BFSApp PUBLIC margot::margot_heel_interface ${CUDA_LIBRARIES})
+target_compile_features(BFSApp PRIVATE cxx_std_17 )
