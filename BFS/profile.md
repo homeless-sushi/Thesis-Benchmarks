@@ -30,5 +30,5 @@ To build and run the BFS benchmark, simply use the scripts provided:
 
 ```console
 $ ./build.sh 
-$ ./run.sh
+$ ./run.sh (BFS | PROFILING)
 ```
