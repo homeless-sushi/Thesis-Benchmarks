@@ -1,17 +1,30 @@
 #ifndef HMLSS_BFS_KNOBS
 #define HMLSS_BFS_KNOBS
 
+#include "HMLSS_Bfs/Bfs.h"
+
 namespace BFS 
 {
-    struct CPUKnobs 
+    struct Knobs
     {
-        unsigned int nThreads;
+        enum DEVICE 
+        {
+            CPU, 
+            GPU
+        };
 
-        CPUKnobs();
-        CPUKnobs(unsigned int nThreads);
+        virtual BfsResult* buildBfs(Graph::Graph& graph, unsigned int source) = 0;
     };
 
-    struct GPUKnobs
+    struct CpuKnobs : public Knobs
+    {
+        unsigned int nThreads;
+        CpuKnobs(unsigned int nThreads = 1);
+
+        BfsResult* buildBfs(Graph::Graph& graph, unsigned int source) override;
+    };
+
+    struct GpuKnobs : public Knobs
     {
         enum BLOCK_SIZE
         {
@@ -41,31 +54,13 @@ namespace BFS
         MEMORY_TYPE edgeOffsets;
         MEMORY_TYPE edges;
 
-        GPUKnobs(
+        GpuKnobs(
             BLOCK_SIZE blockSize = BLOCK_32,
             CHUNK_FACTOR chunkFactor = CHUNK_1, 
             MEMORY_TYPE edgeOffsets = DEVICE_MEMORY,
             MEMORY_TYPE edges = DEVICE_MEMORY);
-    };
 
-    struct Knobs
-    {
-        enum DEVICE 
-        {
-            CPU, 
-            GPU
-        };
-        DEVICE device;
-
-        union 
-        {
-            CPUKnobs cpuKnobs;
-            GPUKnobs gpuKnobs;
-        };
-
-        Knobs();
-        Knobs(CPUKnobs knobs);
-        Knobs(GPUKnobs knobs);
+        BfsResult* buildBfs(Graph::Graph& graph, unsigned int source) override;
     };
 }
 

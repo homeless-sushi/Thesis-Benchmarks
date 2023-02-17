@@ -8,7 +8,7 @@ endif()
 
 #Project name
 project(
-    BFSApp
+    BfsProject
     LANGUAGES CUDA CXX)
 
 #Enable debug with cuda-gdb
@@ -21,24 +21,22 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 
 #When the project is built, create this library
-set(APP_SOURCES "src/main.cc")
-add_executable(BFSApp ${APP_SOURCES})
+add_executable(BfsApp
+    "src/main.cc")
 
-target_include_directories(BFSApp PUBLIC "include")
+target_include_directories(BfsApp PUBLIC "include")
 
 #Run the CMake of libs/HMLSS_Graph, then add the generated library
-set(GRAPH_LIB "HMLSS_Graph")
-add_subdirectory("libs/${GRAPH_LIB}")
-target_link_libraries(BFSApp PUBLIC HMLSS_Graph)
+add_subdirectory("libs/HMLSS_Graph")
+target_link_libraries(BfsApp PUBLIC HMLSS_Graph_LIB)
 
 #Run the CMake of libs/HMLSS_BFS, then add the generated library
-set(BFS_LIB "HMLSS_BFS")
-add_subdirectory("libs/${BFS_LIB}")
-target_link_libraries(BFSApp PUBLIC HMLSS_BFS)
+add_subdirectory("libs/HMLSS_Bfs")
+target_link_libraries(BfsApp PUBLIC HMLSS_Bfs_LIB)
 
 #Margot Heel
 find_package (margot_heel_generator REQUIRED)
 get_filename_component(MARGOT_JSON "margot/margot.json" ABSOLUTE)
 margot_heel_generate_interface("${MARGOT_JSON}")
-target_link_libraries(BFSApp PUBLIC margot::margot_heel_interface ${CUDA_LIBRARIES})
-target_compile_features(BFSApp PRIVATE cxx_std_17 )
+target_link_libraries(BfsApp PUBLIC margot::margot_heel_interface ${CUDA_LIBRARIES})
+target_compile_features(BfsApp PRIVATE cxx_std_17 )

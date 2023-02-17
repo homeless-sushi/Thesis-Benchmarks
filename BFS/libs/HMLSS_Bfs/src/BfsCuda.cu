@@ -1,6 +1,6 @@
-#include "HMLSS_BFS/BFS.h"
-#include "HMLSS_BFS/BFSKnobs.h"
-#include "HMLSS_BFS/BFS_CUDA.h"
+#include "HMLSS_Bfs/Bfs.h"
+#include "HMLSS_Bfs/BfsKnobs.h"
+#include "HMLSS_Bfs/BfsCuda.h"
 
 #include <vector>
 
@@ -10,8 +10,9 @@
 
 namespace BFS
 {
-    BFSCUDA::BFSCUDA(Graph::Graph& graph, unsigned int source) :
-        BFSResult(graph, source)
+    BfsCuda::BfsCuda(GpuKnobs knobs, Graph::Graph& graph, unsigned int source) :
+        BfsResult(graph, source),
+        knobs_(knobs)
     {
         cudaMalloc(&edgeOffsetsDevice_, sizeof(unsigned int)*graph.edgeOffsets.size());
         cudaMemcpy(edgeOffsetsDevice_, graph.edgeOffsets.data(), sizeof(unsigned int)*graph.edgeOffsets.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
@@ -30,36 +31,7 @@ namespace BFS
         cudaMemset(doneDevice_, true, sizeof(bool));
     }
 
-    BFSCUDA::BFSCUDA(
-        Graph::Graph& graph,
-        unsigned int source,
-        int currentCost,
-        std::vector<int> costs) :
-        BFSResult(graph, source)
-    {
-        this->currentCost = currentCost;
-
-        cudaMalloc(&edgeOffsetsDevice_, sizeof(unsigned int)*graph.edgeOffsets.size());
-        cudaMemcpy(edgeOffsetsDevice_, graph.edgeOffsets.data(), sizeof(unsigned int)*graph.edgeOffsets.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
-
-        cudaMalloc(&edgesDevice_, sizeof(unsigned int)*graph.edges.size());
-        cudaMemcpy(edgesDevice_, graph.edges.data(), sizeof(unsigned int)*graph.edges.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
-
-        memset(&edgeOffsetsTexture_, 0, sizeof(cudaTextureObject_t));
-        memset(&edgesTexture_, 0, sizeof(cudaTextureObject_t));
-
-        cudaMalloc(&costsDevice_, sizeof(int)*costs.size());
-        cudaMemcpy(costsDevice_, costs.data(), sizeof(int)*costs.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
-
-        cudaMalloc(&doneDevice_, sizeof(bool));
-        cudaMemset(doneDevice_, true, sizeof(bool));
-    }
-
-    BFSCUDA::BFSCUDA(BFSResult bfsCPU) :
-        BFSCUDA(bfsCPU.graph, bfsCPU.source, bfsCPU.currentCost, bfsCPU.costs())
-    {}
-
-    BFSCUDA::~BFSCUDA() 
+    BfsCuda::~BfsCuda() 
     {
         cudaFree(edgeOffsetsDevice_);
         cudaFree(edgesDevice_);
@@ -94,8 +66,8 @@ namespace BFS
             unsigned int *edgesDevice,
             cudaTextureObject_t edgeOffsetsTexture,
             cudaTextureObject_t edgesTexture,
-            BFS::GPUKnobs::MEMORY_TYPE edgeOffsetsType,
-            BFS::GPUKnobs::MEMORY_TYPE edgesType,
+            BFS::GpuKnobs::MEMORY_TYPE edgeOffsetsType,
+            BFS::GpuKnobs::MEMORY_TYPE edgesType,
             int *costs,
             int currCost,
             bool *done)
@@ -108,7 +80,7 @@ namespace BFS
                     unsigned int nodeEdgesEnd;
                     switch (edgeOffsetsType)
                     {
-                        case BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
+                        case BFS::GpuKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
                             nodeEdgesStart = tex1Dfetch<unsigned int>(edgeOffsetsTexture, fromNode);
                             nodeEdgesEnd = tex1Dfetch<unsigned int>(edgeOffsetsTexture, fromNode+1);
                             break;
@@ -122,7 +94,7 @@ namespace BFS
                         unsigned int toNode;
                         switch (edgesType)
                         {
-                            case BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
+                            case BFS::GpuKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
                                 toNode = tex1Dfetch<unsigned int>(edgesTexture, i);
                                 break;
                             
@@ -140,17 +112,17 @@ namespace BFS
         }
     }
 
-    bool BFSCUDA::kernel(BFS::Knobs knobs)
+    bool BfsCuda::kernel()
     {
         cudaMemset(doneDevice_, true, sizeof(bool));
 
-        if(knobs.gpuKnobs.edgeOffsets == BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgeOffsetsTexture_ == 0)
+        if(knobs_.edgeOffsets == BFS::GpuKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgeOffsetsTexture_ == 0)
             createTextureObject(edgeOffsetsDevice_, &edgeOffsetsTexture_, graph.edgeOffsets.size());
-        if(knobs.gpuKnobs.edges == BFS::GPUKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgesTexture_ == 0)
+        if(knobs_.edges == BFS::GpuKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgesTexture_ == 0)
             createTextureObject(edgesDevice_, &edgesTexture_, graph.edges.size());
 
-        const unsigned int blockDim = knobs.gpuKnobs.blockSize;
-        const unsigned int chunkSize = blockDim * knobs.gpuKnobs.chunkFactor;
+        const unsigned int blockDim = knobs_.blockSize;
+        const unsigned int chunkSize = blockDim * knobs_.chunkFactor;
         const unsigned int gridDim = (graph.nVertices + blockDim - 1)/chunkSize + 1;
 
         CUDAkernel<<<gridDim, blockDim>>>(
@@ -160,8 +132,8 @@ namespace BFS
             edgesDevice_,
             edgeOffsetsTexture_,
             edgesTexture_,
-            knobs.gpuKnobs.edgeOffsets,
-            knobs.gpuKnobs.edges,
+            knobs_.edgeOffsets,
+            knobs_.edges,
             costsDevice_,
             currentCost,
             doneDevice_);
@@ -172,7 +144,7 @@ namespace BFS
         return done;
     }
 
-    const std::vector<int>& BFSCUDA::costs() 
+    const std::vector<int>& BfsCuda::costs() 
     {
         costsHost_.reserve(graph.nVertices);
         costsHost_.resize(costsHost_.capacity());

@@ -1,7 +1,7 @@
 #ifndef HMLSS_BFS_UTILS
 #define HMLSS_BFS_UTILS
 
-#include "HMLSS_BFS/BFS.h"
+#include "HMLSS_Bfs/Bfs.h"
 
 #include <string>
 
@@ -9,7 +9,7 @@
 
 namespace BFSUtils
 {
-    int WriteGraphResultFile(std::string fileURL, BFS::BFSResult& bfs);
+    int WriteGraphResultFile(std::string fileURL, BFS::BfsResult& bfs);
 }
 
 #endif //HMLSS_BFS_UTILS

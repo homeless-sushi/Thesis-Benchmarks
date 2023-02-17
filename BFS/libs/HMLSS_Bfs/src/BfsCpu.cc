@@ -1,4 +1,6 @@
-#include "HMLSS_BFS/BFS.h"
+#include "HMLSS_Bfs/Bfs.h"
+#include "HMLSS_Bfs/BfsKnobs.h"
+#include "HMLSS_Bfs/BfsCpu.h"
 
 #include <iostream>
 
@@ -8,37 +10,22 @@
 
 namespace BFS 
 {
-    BFSResult::BFSResult(Graph::Graph& graph, unsigned int source) :
-        graph(graph),
-        source{source},
-        currentCost{0},
+    BfsCpu::BfsCpu(BFS::CpuKnobs knobs, Graph::Graph& graph, unsigned int source) :
+        BfsResult(graph, source),
+        knobs_(knobs),
         costs_(graph.nVertices, -1)
     {
         costs_[source] = 0;
     }
+    BfsCpu::~BfsCpu() = default;
 
-    BFSResult::BFSResult(
-        Graph::Graph& graph,
-        unsigned int source,
-        int currentCost,
-        std::vector<int> costs) :
-        graph(graph),
-        source{source},
-        currentCost{currentCost}
-    {
-        costs_ = costs;
-    }
-    
-    BFSResult::~BFSResult() = default;
+    const std::vector<int>& BfsCpu::costs() { return costs_; }
 
-    const std::vector<int>& BFSResult::costs() { return costs_; }
-
-    bool BFSResult::kernel(BFS::Knobs knobs) 
+    bool BfsCpu::kernel() 
     {
         bool done = true;
-
         #pragma omp parallel for \
-        num_threads(knobs.cpuKnobs.nThreads)
+        num_threads(knobs_.nThreads)
         for(int fromNode = 0; fromNode < graph.nVertices; fromNode++){
             if (costs_[fromNode] == currentCost){
                 const int nodeEdgesStart = graph.edgeOffsets[fromNode];
