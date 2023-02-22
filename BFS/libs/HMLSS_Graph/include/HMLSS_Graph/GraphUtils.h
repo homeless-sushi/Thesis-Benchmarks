@@ -7,7 +7,7 @@
 
 namespace GraphUtils 
 {
-    int ReadGraphFile(std::string fileURL, Graph::Graph& graph);
+    Graph::Graph ReadGraphFile(std::string fileURL);
 }
 
 #endif //HMLSS_GRAPH_UTILS

@@ -5,15 +5,15 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <filesystem>
 
 namespace GraphUtils 
 {
-    int ReadGraphFile(std::string fileURL, Graph::Graph& graph)
+    Graph::Graph ReadGraphFile(std::string fileURL)
     {
 	    std::ifstream graphFile(fileURL);
         if (!graphFile.is_open()){
-            std::cout << "Error: Cannot open " << fileURL << std::endl;
-            return -1;
+            throw std::runtime_error("Cannot open file: " + fileURL);
         }
         
         std::string lineString;
@@ -23,7 +23,7 @@ namespace GraphUtils
         firstLineStream >> nVertices;
         unsigned int nEdges;
         firstLineStream >> nEdges;
-        graph = Graph::Graph(nVertices, nEdges);
+        Graph::Graph graph(nVertices, nEdges);
         
         unsigned int nEdgesRead = 0;
         graph.edgeOffsets.push_back(nEdgesRead);
@@ -41,7 +41,7 @@ namespace GraphUtils
             graph.edgeOffsets.push_back(nEdgesRead);
         }
         graphFile.close();
-        return 0;
+        return graph;
     }
 
     int WriteGraphFile(std::string fileURL, Graph::Graph& graph)

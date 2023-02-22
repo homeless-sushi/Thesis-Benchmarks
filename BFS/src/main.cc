@@ -18,8 +18,7 @@ int main(int argc, char *argv[])
     }
 
     std::string inputFileURL(argv[1]);
-    Graph::Graph graph;
-    GraphUtils::ReadGraphFile(inputFileURL, graph);
+    Graph::Graph graph(GraphUtils::ReadGraphFile(inputFileURL));
 
     BFS::Knobs* knobs = new BFS::GpuKnobs();
     BFS::BfsResult* bfs = knobs->buildBfs(graph, 0);
