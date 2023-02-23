@@ -39,6 +39,12 @@ add_subdirectory("libs/HMLSS_Bfs")
 target_link_libraries(BfsAlgorithm PUBLIC HMLSS_Bfs_LIB)
 target_link_libraries(BfsProfiling PUBLIC HMLSS_Bfs_LIB)
 
+#Boost Program Options
+find_package(Boost REQUIRED
+    COMPONENTS program_options)
+target_include_directories(BfsAlgorithm PUBLIC ${Boost_INCLUDE_DIR})
+target_link_libraries(BfsAlgorithm PUBLIC ${Boost_LIBRARIES})
+
 #Margot Heel
 find_package (margot_heel_generator REQUIRED)
 get_filename_component(MARGOT_JSON "margot/margot.json" ABSOLUTE)
