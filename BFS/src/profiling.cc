@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
     unsigned int gpuChunkFactorExp = 0;
     BFS::GpuKnobs::CHUNK_FACTOR gpuChunkFactor = BFS::GpuKnobs::CHUNK_FACTOR::CHUNK_1;
     unsigned int gpuEdgeOffsetsMemoryType = 0;
-    BFS::GpuKnobs::MEMORY_TYPE gpuEdgeOffsetsMemory = BFS::GpuKnobs::MEMORY_TYPE::DEVICE_MEMORY;
+    BFS::GpuKnobs::MEMORY_TYPE gpuEdgeOffsetsMemory = BFS::GpuKnobs::MEMORY_TYPE::DEVICE;
     unsigned int gpuEdgesMemoryType = 0;
-    BFS::GpuKnobs::MEMORY_TYPE gpuEdgesMemory = BFS::GpuKnobs::MEMORY_TYPE::DEVICE_MEMORY;
+    BFS::GpuKnobs::MEMORY_TYPE gpuEdgesMemory = BFS::GpuKnobs::MEMORY_TYPE::DEVICE;
 
     while(margot::bfs::context().manager.in_design_space_exploration())
     {

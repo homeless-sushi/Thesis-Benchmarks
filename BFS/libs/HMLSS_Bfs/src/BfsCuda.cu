@@ -80,7 +80,7 @@ namespace BFS
                     unsigned int nodeEdgesEnd;
                     switch (edgeOffsetsType)
                     {
-                        case BFS::GpuKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
+                        case BFS::GpuKnobs::MEMORY_TYPE::TEXTURE:
                             nodeEdgesStart = tex1Dfetch<unsigned int>(edgeOffsetsTexture, fromNode);
                             nodeEdgesEnd = tex1Dfetch<unsigned int>(edgeOffsetsTexture, fromNode+1);
                             break;
@@ -94,7 +94,7 @@ namespace BFS
                         unsigned int toNode;
                         switch (edgesType)
                         {
-                            case BFS::GpuKnobs::MEMORY_TYPE::TEXTURE_MEMORY:
+                            case BFS::GpuKnobs::MEMORY_TYPE::TEXTURE:
                                 toNode = tex1Dfetch<unsigned int>(edgesTexture, i);
                                 break;
                             
@@ -116,9 +116,9 @@ namespace BFS
     {
         cudaMemset(doneDevice_, true, sizeof(bool));
 
-        if(knobs_.edgeOffsets == BFS::GpuKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgeOffsetsTexture_ == 0)
+        if(knobs_.edgeOffsets == BFS::GpuKnobs::MEMORY_TYPE::TEXTURE && edgeOffsetsTexture_ == 0)
             createTextureObject(edgeOffsetsDevice_, &edgeOffsetsTexture_, graph.edgeOffsets.size());
-        if(knobs_.edges == BFS::GpuKnobs::MEMORY_TYPE::TEXTURE_MEMORY && edgesTexture_ == 0)
+        if(knobs_.edges == BFS::GpuKnobs::MEMORY_TYPE::TEXTURE && edgesTexture_ == 0)
             createTextureObject(edgesDevice_, &edgesTexture_, graph.edges.size());
 
         const unsigned int blockDim = knobs_.blockSize;
