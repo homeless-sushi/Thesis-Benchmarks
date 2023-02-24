@@ -11,3 +11,6 @@ target_include_directories(HMLSS_Bfs_LIB PUBLIC "include")
 
 #Add HMLSS Graph dependency
 target_link_libraries(HMLSS_Bfs_LIB HMLSS_Graph_LIB)
+
+#Add utils dependency
+target_link_libraries(HMLSS_Bfs_LIB utils_LIB)

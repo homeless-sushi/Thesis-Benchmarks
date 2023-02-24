@@ -3,15 +3,13 @@
 
 #include "HMLSS_Bfs/Bfs.h"
 
+#include "utils/enum.h"
+
 namespace BFS 
 {
     struct Knobs
     {
-        enum DEVICE 
-        {
-            CPU, 
-            GPU
-        };
+        DEFINE_ENUM_WITH_STRING_CONVERSIONS(DEVICE, (CPU)(GPU))
 
         virtual BfsResult* buildBfs(Graph::Graph& graph, unsigned int source) = 0;
     };
@@ -46,19 +44,15 @@ namespace BFS
         };
         CHUNK_FACTOR chunkFactor;
 
-        enum MEMORY_TYPE
-        {
-            DEVICE_MEMORY = 0,
-            TEXTURE_MEMORY = 1
-        };
+        DEFINE_ENUM_WITH_STRING_CONVERSIONS(MEMORY_TYPE, (DEVICE)(TEXTURE))
         MEMORY_TYPE edgeOffsets;
         MEMORY_TYPE edges;
 
         GpuKnobs(
             BLOCK_SIZE blockSize = BLOCK_32,
             CHUNK_FACTOR chunkFactor = CHUNK_1, 
-            MEMORY_TYPE edgeOffsets = DEVICE_MEMORY,
-            MEMORY_TYPE edges = DEVICE_MEMORY);
+            MEMORY_TYPE edgeOffsets = DEVICE,
+            MEMORY_TYPE edges = DEVICE);
 
         BfsResult* buildBfs(Graph::Graph& graph, unsigned int source) override;
     };

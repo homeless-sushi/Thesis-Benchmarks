@@ -39,6 +39,10 @@ add_subdirectory("libs/HMLSS_Bfs")
 target_link_libraries(BfsAlgorithm PUBLIC HMLSS_Bfs_LIB)
 target_link_libraries(BfsProfiling PUBLIC HMLSS_Bfs_LIB)
 
+#Run the CMake of libs/utils, then add the generated library
+add_subdirectory("libs/utils")
+target_link_libraries(BfsAlgorithm PUBLIC utils_LIB)
+
 #Boost Program Options
 find_package(Boost REQUIRED
     COMPONENTS program_options)
