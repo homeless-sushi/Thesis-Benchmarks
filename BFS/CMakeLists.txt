@@ -51,7 +51,7 @@ target_link_libraries(BfsAlgorithm PUBLIC ${Boost_LIBRARIES})
 
 #Margot Heel
 find_package (margot_heel_generator REQUIRED)
-get_filename_component(MARGOT_JSON "margot/margot.json" ABSOLUTE)
+get_filename_component(MARGOT_JSON "margot/margot_profiling.json" ABSOLUTE)
 margot_heel_generate_interface("${MARGOT_JSON}")
 target_link_libraries(BfsProfiling PUBLIC margot::margot_heel_interface ${CUDA_LIBRARIES})
 target_compile_features(BfsProfiling PRIVATE cxx_std_17 )
