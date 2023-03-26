@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <string>
 #include <sstream>
 
@@ -8,7 +9,11 @@
 
 #include <unistd.h>
 
+#include "HMLSS_Graph/Graph.h"
+#include "HMLSS_Graph/GraphUtils.h"
+#include "HMLSS_Bfs/Bfs.h"
 #include "HMLSS_Bfs/BfsKnobs.h"
+#include "HMLSS_Bfs/BfsUtils.h"
 
 #include "AppRegisterCommon/AppRegister.h"
 #include "AppRegisterCommon/Semaphore.h"
@@ -82,20 +87,21 @@ int main(int argc, char *argv[])
             margot::bfs::context().manager.configuration_applied();
         }
 
-        std::stringstream command;
-        command << "./" << argv[1];
-        command << " -I " << argv[2];
-        command << " -O " << argv[3];
-        command << " -D " << BFS::Knobs::ToString(device);
-        command << " --cpu-num-threads " << cpuThreads;
-        command << " --gpu-block-dim " << gpuBlockSize;
-        command << " --gpu-chunk-factor " << gpuChunkFactor;
-        command << " --gpu-offset-mem " << BFS::GpuKnobs::ToString(gpuOffsetsMem);
-        command << " --gpu-edge-mem " << BFS::GpuKnobs::ToString(gpuEdgesMem);
 
         margot::bfs::start_monitors();
 
-        std::system(command.str().c_str());
+        std::string inputFileURL(argv[2]);
+        Graph::Graph graph(GraphUtils::ReadGraphFile(inputFileURL));
+        std::unique_ptr<BFS::Knobs> knobs( 
+            device == BFS::Knobs::DEVICE::GPU ?
+            static_cast<BFS::Knobs*>(new BFS::GpuKnobs(gpuBlockSize, gpuChunkFactor, gpuOffsetsMem, gpuEdgesMem)) :
+            static_cast<BFS::Knobs*>(new BFS::CpuKnobs(cpuThreads))
+        );
+        std::unique_ptr<BFS::BfsResult> bfs(knobs->buildBfs(graph, 0));
+        while(!bfs->kernel()){}
+        if(argc >= 4){
+            BFSUtils::WriteGraphResultFile(argv[3], *bfs);
+        }
 
         margot::bfs::stop_monitors();
         margot::bfs::push_custom_monitor_values();
