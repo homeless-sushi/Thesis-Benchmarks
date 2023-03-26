@@ -55,6 +55,13 @@ int main(int argc, char *argv[])
     BFS::GpuKnobs::MEMORY_TYPE gpuEdgesMem = static_cast<BFS::GpuKnobs::MEMORY_TYPE>(gpuEdgesMemId);
 
     int dataSemId = semget(getpid(), 1, 0);
+
+    //Spinlock
+    while(true){
+        if(isRegistered(data))
+            break;
+    }
+
     while(!stop)
     {
         //Read knobs
