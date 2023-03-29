@@ -58,8 +58,10 @@ int main(int argc, char *argv[])
 
     //Spinlock
     while(true){
-        if(isRegistered(data))
+        if(isRegistered(data)){
+            setTickStartTime(data);
             break;
+        }
     }
 
     while(!stop)
