@@ -15,5 +15,5 @@ then
 elif [ $1 = PROFILING ]
 then 
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/Documents/Thesis/margot/paho.mqtt.c/build/src/
-    ./build/BfsProfiling -A build/BfsAlgorithm -I Graphs/v15k_e9_l.txt -O Graphs/res.txt
+    ./build/BfsProfiling -I Graphs/v15k_e9_l.txt -O Graphs/res.txt
 fi
