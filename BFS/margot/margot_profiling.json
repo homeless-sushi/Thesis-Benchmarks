@@ -25,9 +25,9 @@
 					"range": [ 0, 2, 1 ]
 				},
                 {
-					"name": "CPU_THREADS_EXP",
+					"name": "CPU_THREADS",
 					"type": "unsigned int",
-					"range": [ 0, 5, 1 ]
+					"range": [ 1, 21, 1 ]
 				},
 				{
 					"name": "GPU_BLOCK_EXP",
@@ -60,7 +60,7 @@
 				"broker_ca": "",
 				"client_cert": "",
 				"client_key": "",
-        		"number_configurations_per_iteration": 960,
+        		"number_configurations_per_iteration": 3840,
         		"number_observations_per_configuration": 1,
         		"max_number_iteration": 10,
 				"clustering_plugin": "cluster",

@@ -50,7 +50,7 @@
 					"comparison": "-"
 				},
 				{
-					"name": "CPU_THREADS_EXP",
+					"name": "CPU_THREADS",
 					"type": "unsigned int",
 					"comparison": "-"
 				}

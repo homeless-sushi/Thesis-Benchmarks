@@ -15,7 +15,7 @@ def main() :
     for index, row in df.iterrows() :
         features = {}
         features["DEVICE_TYPE"] = row["DEVICE_TYPE"]
-        features["CPU_THREADS_EXP"] = row["CPU_THREADS_EXP"]
+        features["CPU_THREADS"] = row["CPU_THREADS"]
 
         knobs = {}
         knobs["GPU_BLOCK_EXP"] = row["GPU_BLOCK_EXP"]

@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
     unsigned int deviceId = 0;
     BFS::Knobs::DEVICE device = static_cast<BFS::Knobs::DEVICE>(deviceId);
     unsigned int cpuThreads = 1;
-    unsigned int cpuThreadsExp = 0;
     BFS::GpuKnobs::BLOCK_SIZE gpuBlockSize = BFS::GpuKnobs::BLOCK_SIZE::BLOCK_32;
     unsigned int gpuBlockSizeExp = 0;
     BFS::GpuKnobs::CHUNK_FACTOR gpuChunkFactor = BFS::GpuKnobs::CHUNK_FACTOR::CHUNK_1;
@@ -77,12 +76,11 @@ int main(int argc, char *argv[])
         //Read knobs
         binarySemaphoreWait(dataSemId);
         cpuThreads = getNCpuCores(data);
-        cpuThreadsExp = log2(cpuThreads);
         device = getUseGpu(data) ? BFS::Knobs::DEVICE::GPU : BFS::Knobs::DEVICE::CPU; 
         deviceId = static_cast<unsigned int>(device);
         binarySemaphorePost(dataSemId);
         
-        if(margot::bfs::update(cpuThreadsExp, deviceId, gpuBlockSizeExp, gpuChunkFactorExp, gpuEdgesMemId, gpuOffsetsMemId)){
+        if(margot::bfs::update(cpuThreads, deviceId, gpuBlockSizeExp, gpuChunkFactorExp, gpuEdgesMemId, gpuOffsetsMemId)){
             gpuBlockSize = static_cast<BFS::GpuKnobs::BLOCK_SIZE>(BFS::GpuKnobs::BLOCK_SIZE::BLOCK_32 << gpuBlockSizeExp);
             gpuChunkFactor = static_cast<BFS::GpuKnobs::CHUNK_FACTOR>(BFS::GpuKnobs::CHUNK_FACTOR::CHUNK_1 << gpuChunkFactorExp);
             gpuOffsetsMem = static_cast<BFS::GpuKnobs::MEMORY_TYPE>(gpuOffsetsMemId);
