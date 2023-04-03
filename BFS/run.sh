@@ -19,7 +19,13 @@ then
         echo "No input graph supplied; default input graph is used: $INPUT"
     fi
 
-    ./build/BfsBenchmark -I $INPUT -O Graphs/res.txt
+    INSTANCE_NAME=""
+    if [ ! -z "$3" ]
+    then
+        INSTANCE_NAME="--instance-name $3 "
+    fi
+
+    ./build/BfsBenchmark -I $INPUT -O Graphs/res.txt $INSTANCE_NAME
 elif [ $1 = PROFILING ]
 then 
     INPUT="Graphs/v15k_e9_l.txt"
