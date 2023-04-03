@@ -4,18 +4,21 @@
 
 #include <cstdlib>
 
+#include <boost/program_options.hpp>
+
 #include "HMLSS_Bfs/BfsKnobs.h"
 
 #include <margot/margot.hpp>
 
+namespace po = boost::program_options;
+
+po::options_description SetupOptions();
+
 int main(int argc, char *argv[])
 {
-    if(argc < 4){
-        std::cout << "Error: Invalid arguments!" << std::endl;
-        std::cout << "\tUsage: " << argv[0] << "BfsProgram graph.txt res.txt" << std::endl;
-        return -1;
-    }
-    std::string graph(argv[2]);
+    po::options_description desc(SetupOptions());
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
 
     margot::init();
     margot::bfs::context().manager.wait_for_knowledge(10);
@@ -46,9 +49,9 @@ int main(int argc, char *argv[])
         }
 
         std::stringstream command;
-        command << "./" << argv[1];
-        command << " -I " << argv[2];
-        command << " -O " << argv[3];
+        command << "./" << vm["bfs-program"].as<std::string>();
+        command << " -I " << vm["input-file"].as<std::string>();
+        command << " -O " << vm["output-file"].as<std::string>();
         command << " -D " << BFS::Knobs::ToString(device);
         command << " --cpu-num-threads " << cpuThreads;
         command << " --gpu-block-dim " << gpuBlockSize;
@@ -64,4 +67,17 @@ int main(int argc, char *argv[])
         margot::bfs::push_custom_monitor_values();
         margot::bfs::log();
     }
+}
+
+po::options_description SetupOptions()
+{
+    po::options_description desc("Allowed options");
+    desc.add_options()
+    ("help", "Display help message")
+    ("bfs-program,A", po::value<std::string>(), "bfs program to profile")
+    ("input-file,I", po::value<std::string>(), "input file with graph description")
+    ("output-file,O", po::value<std::string>(), "output file with bfs solution")
+    ;
+
+    return desc;
 }

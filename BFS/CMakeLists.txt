@@ -45,6 +45,7 @@ find_package(Boost REQUIRED
 target_include_directories(BfsAlgorithm PUBLIC ${Boost_INCLUDE_DIR})
 target_link_libraries(BfsAlgorithm PUBLIC ${Boost_LIBRARIES})
 
+
 if(BUILD_IS STREQUAL BENCHMARK)
 
     add_executable(BfsBenchmark
@@ -83,11 +84,13 @@ elseif(BUILD_IS STREQUAL PROFILING)
     target_include_directories(BfsProfiling 
         PUBLIC 
             "include"
+            ${Boost_INCLUDE_DIR}
     )
     target_link_libraries(BfsProfiling 
         PUBLIC 
             HMLSS_Graph_LIB
             HMLSS_Bfs_LIB
+            ${Boost_LIBRARIES}
     )
 
     find_package (margot_heel_generator REQUIRED)
