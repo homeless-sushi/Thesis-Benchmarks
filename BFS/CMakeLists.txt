@@ -54,11 +54,13 @@ if(BUILD_IS STREQUAL BENCHMARK)
     target_include_directories(BfsBenchmark 
         PUBLIC 
             "include"
+            ${Boost_INCLUDE_DIR}
     )
     target_link_libraries(BfsBenchmark 
         PUBLIC 
             HMLSS_Graph_LIB
             HMLSS_Bfs_LIB
+            ${Boost_LIBRARIES}
     )
 
     find_package (margot_heel_generator REQUIRED)

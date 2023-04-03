@@ -9,6 +9,8 @@
 
 #include <unistd.h>
 
+#include <boost/program_options.hpp>
+
 #include "HMLSS_Graph/Graph.h"
 #include "HMLSS_Graph/GraphUtils.h"
 #include "HMLSS_Bfs/Bfs.h"
@@ -22,16 +24,17 @@
 
 #include <margot/margot.hpp>
 
+namespace po = boost::program_options;
+
+po::options_description SetupOptions();
+
 bool stop = false;
 
 int main(int argc, char *argv[])
 {
-    if(argc < 4){
-        std::cout << "Error: Invalid arguments!" << std::endl;
-        std::cout << "\tUsage: " << argv[0] << "BfsProgram graph.txt res.txt" << std::endl;
-        return -1;
-    }
-    std::string graph(argv[2]);
+    po::options_description desc(SetupOptions());
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
 
     //Stop when Ctrl+C is called
     std::signal(SIGINT, [](int signal){
@@ -90,8 +93,7 @@ int main(int argc, char *argv[])
 
         margot::bfs::start_monitors();
 
-        std::string inputFileURL(argv[2]);
-        Graph::Graph graph(GraphUtils::ReadGraphFile(inputFileURL));
+        Graph::Graph graph(GraphUtils::ReadGraphFile(vm["input-file"].as<std::string>()));
         std::unique_ptr<BFS::Knobs> knobs( 
             device == BFS::Knobs::DEVICE::GPU ?
             static_cast<BFS::Knobs*>(new BFS::GpuKnobs(gpuBlockSize, gpuChunkFactor, gpuOffsetsMem, gpuEdgesMem)) :
@@ -99,8 +101,8 @@ int main(int argc, char *argv[])
         );
         std::unique_ptr<BFS::BfsResult> bfs(knobs->buildBfs(graph, 0));
         while(!bfs->kernel()){}
-        if(argc >= 4){
-            BFSUtils::WriteGraphResultFile(argv[3], *bfs);
+        if(vm.count("output-file")){
+            BFSUtils::WriteGraphResultFile(vm["output-file"].as<std::string>(), *bfs);
         }
 
         margot::bfs::stop_monitors();
@@ -115,4 +117,16 @@ int main(int argc, char *argv[])
 
     //Detach from controller
     registerDetach(data);
+}
+
+po::options_description SetupOptions()
+{
+    po::options_description desc("Allowed options");
+    desc.add_options()
+    ("help", "Display help message")
+    ("input-file,I", po::value<std::string>(), "input file with graph description")
+    ("output-file,O", po::value<std::string>(), "output file with bfs solution")
+    ;
+
+    return desc;
 }

@@ -11,7 +11,15 @@ then
     --gpu-edge-mem TEXTURE 
 elif [ $1 = BENCHMARK ]
 then 
-    ./build/BfsBenchmark build/BfsAlgorithm Graphs/v15k_e9_l.txt Graphs/res.txt
+    INPUT="Graphs/v15k_e9_l.txt"
+    if [ ! -z "$2" ]
+    then
+        INPUT="$2"
+    else 
+        echo "No input graph supplied; default input graph is used: $INPUT"
+    fi
+
+    ./build/BfsBenchmark -I $INPUT -O Graphs/res.txt
 elif [ $1 = PROFILING ]
 then 
     INPUT="Graphs/v15k_e9_l.txt"
