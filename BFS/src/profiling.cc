@@ -17,6 +17,20 @@
 namespace po = boost::program_options;
 
 po::options_description SetupOptions();
+void CastKnobs(
+    unsigned int deviceId,
+    unsigned int cpuThreadsExp,
+    unsigned int gpuBlockSizeExp,
+    unsigned int gpuChunkFactorExp,
+    unsigned int gpuOffsetsMemId,
+    unsigned int gpuEdgesMemId,
+    BFS::Knobs::DEVICE& device,
+    unsigned int& cpuThreads,
+    BFS::GpuKnobs::BLOCK_SIZE& gpuBlockSize, 
+    BFS::GpuKnobs::CHUNK_FACTOR& gpuChunkFactor,
+    BFS::GpuKnobs::MEMORY_TYPE& gpuOffsetsMem,
+    BFS::GpuKnobs::MEMORY_TYPE& gpuEdgesMem
+);
 
 int main(int argc, char *argv[])
 {
@@ -28,27 +42,51 @@ int main(int argc, char *argv[])
     margot::bfs::context().manager.wait_for_knowledge(10);
 
     unsigned int deviceId = 0;
-    BFS::Knobs::DEVICE device = static_cast<BFS::Knobs::DEVICE>(deviceId);
-    unsigned int cpuThreads = 1;
     unsigned int cpuThreadsExp = 0;
-    BFS::GpuKnobs::BLOCK_SIZE gpuBlockSize = BFS::GpuKnobs::BLOCK_SIZE::BLOCK_32;
     unsigned int gpuBlockSizeExp = 0;
-    BFS::GpuKnobs::CHUNK_FACTOR gpuChunkFactor = BFS::GpuKnobs::CHUNK_FACTOR::CHUNK_1;
     unsigned int gpuChunkFactorExp = 0;
     unsigned int gpuOffsetsMemId = 0;
-    BFS::GpuKnobs::MEMORY_TYPE gpuOffsetsMem = static_cast<BFS::GpuKnobs::MEMORY_TYPE>(gpuOffsetsMemId);
     unsigned int gpuEdgesMemId = 0;
-    BFS::GpuKnobs::MEMORY_TYPE gpuEdgesMem = static_cast<BFS::GpuKnobs::MEMORY_TYPE>(gpuEdgesMemId);
+
+    BFS::Knobs::DEVICE device;
+    unsigned int cpuThreads;
+    BFS::GpuKnobs::BLOCK_SIZE gpuBlockSize; 
+    BFS::GpuKnobs::CHUNK_FACTOR gpuChunkFactor;
+    BFS::GpuKnobs::MEMORY_TYPE gpuOffsetsMem;
+    BFS::GpuKnobs::MEMORY_TYPE gpuEdgesMem;
+
+    CastKnobs(
+        deviceId,
+        cpuThreadsExp,
+        gpuBlockSizeExp,
+        gpuChunkFactorExp,
+        gpuOffsetsMemId,
+        gpuEdgesMemId,
+        device,
+        cpuThreads,
+        gpuBlockSize, 
+        gpuChunkFactor,
+        gpuOffsetsMem,
+        gpuEdgesMem
+    );
 
     while(margot::bfs::context().manager.in_design_space_exploration()){
-        
+
         if(margot::bfs::update(cpuThreadsExp, deviceId, gpuBlockSizeExp, gpuChunkFactorExp, gpuEdgesMemId, gpuOffsetsMemId)){
-            device = static_cast<BFS::Knobs::DEVICE>(deviceId);
-            cpuThreads = 1 << cpuThreadsExp;
-            gpuBlockSize = static_cast<BFS::GpuKnobs::BLOCK_SIZE>(BFS::GpuKnobs::BLOCK_SIZE::BLOCK_32 << gpuBlockSizeExp);
-            gpuChunkFactor = static_cast<BFS::GpuKnobs::CHUNK_FACTOR>(BFS::GpuKnobs::CHUNK_FACTOR::CHUNK_1 << gpuChunkFactorExp);
-            gpuOffsetsMem = static_cast<BFS::GpuKnobs::MEMORY_TYPE>(gpuOffsetsMemId);
-            gpuEdgesMem = static_cast<BFS::GpuKnobs::MEMORY_TYPE>(gpuEdgesMemId);
+            CastKnobs(
+                deviceId,
+                cpuThreadsExp,
+                gpuBlockSizeExp,
+                gpuChunkFactorExp,
+                gpuOffsetsMemId,
+                gpuEdgesMemId,
+                device,
+                cpuThreads,
+                gpuBlockSize, 
+                gpuChunkFactor,
+                gpuOffsetsMem,
+                gpuEdgesMem
+            );
             margot::bfs::context().manager.configuration_applied();
         }
 
@@ -82,4 +120,27 @@ po::options_description SetupOptions()
     ;
 
     return desc;
+}
+
+void CastKnobs(
+    unsigned int deviceId,
+    unsigned int cpuThreadsExp,
+    unsigned int gpuBlockSizeExp,
+    unsigned int gpuChunkFactorExp,
+    unsigned int gpuOffsetsMemId,
+    unsigned int gpuEdgesMemId,
+    BFS::Knobs::DEVICE& device,
+    unsigned int& cpuThreads,
+    BFS::GpuKnobs::BLOCK_SIZE& gpuBlockSize, 
+    BFS::GpuKnobs::CHUNK_FACTOR& gpuChunkFactor,
+    BFS::GpuKnobs::MEMORY_TYPE& gpuOffsetsMem,
+    BFS::GpuKnobs::MEMORY_TYPE& gpuEdgesMem
+)
+{
+    device = static_cast<BFS::Knobs::DEVICE>(deviceId);
+    cpuThreads = 1 << cpuThreadsExp;
+    gpuBlockSize = static_cast<BFS::GpuKnobs::BLOCK_SIZE>(BFS::GpuKnobs::BLOCK_SIZE::BLOCK_32 << gpuBlockSizeExp);
+    gpuChunkFactor = static_cast<BFS::GpuKnobs::CHUNK_FACTOR>(BFS::GpuKnobs::CHUNK_FACTOR::CHUNK_1 << gpuChunkFactorExp);
+    gpuOffsetsMem = static_cast<BFS::GpuKnobs::MEMORY_TYPE>(gpuOffsetsMemId);
+    gpuEdgesMem = static_cast<BFS::GpuKnobs::MEMORY_TYPE>(gpuEdgesMemId);
 }
