@@ -25,7 +25,13 @@ then
         INSTANCE_NAME="--instance-name $3 "
     fi
 
-    ./build/BfsBenchmark -I $INPUT -O Graphs/res.txt $INSTANCE_NAME
+    TARGET_THROUGHPUT=""
+    if [ ! -z "$4" ]
+    then
+        TARGET_THROUGHPUT="--target-throughput $4 "
+    fi
+
+    ./build/BfsBenchmark -I $INPUT -O Graphs/res.txt $INSTANCE_NAME $TARGET_THROUGHPUT
 elif [ $1 = PROFILING ]
 then 
     INPUT="Graphs/v15k_e9_l.txt"

@@ -55,7 +55,11 @@ int main(int argc, char *argv[])
     });
 
     //Attach to controller
-    struct app_data* data = registerAttach(vm["instance-name"].as<std::string>().c_str(), 1, 1, false);
+    struct app_data* data = registerAttach(
+        vm["instance-name"].as<std::string>().c_str(),
+        vm["target-throughput"].as<long double>(),
+        1,
+        false);
     int dataSemId = semget(getpid(), 1, 0);
 
     margot::init();
@@ -141,6 +145,7 @@ po::options_description SetupOptions()
     ("input-file,I", po::value<std::string>(), "input file with graph description")
     ("output-file,O", po::value<std::string>(), "output file with bfs solution")
     ("instance-name", po::value<std::string>()->default_value("BFS"), "name of benchmark instance")
+    ("target-throughput", po::value<long double>()->default_value(1.0), "target throughput for the kernel")
     ;
 
     return desc;
