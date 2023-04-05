@@ -54,10 +54,11 @@ int main(int argc, char *argv[])
         }
     });
 
+    long double targetThroughput = vm["target-throughput"].as<long double>();
     //Attach to controller
     struct app_data* data = registerAttach(
         vm["instance-name"].as<std::string>().c_str(),
-        vm["target-throughput"].as<long double>(),
+        targetThroughput,
         1,
         false);
     int dataSemId = semget(getpid(), 1, 0);
@@ -128,6 +129,7 @@ int main(int argc, char *argv[])
         margot::bfs::log();
 
         //Add tick
+        autosleep(data, targetThroughput);
         binarySemaphoreWait(dataSemId);
         addTick(data, 1);
         binarySemaphorePost(dataSemId);
