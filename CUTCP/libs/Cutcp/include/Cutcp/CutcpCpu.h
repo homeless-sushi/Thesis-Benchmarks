@@ -1,5 +1,5 @@
-#ifndef CUTCP_CUTCP_H
-#define CUTCP_CUTCP_H
+#ifndef CUTCP_CUTCP_CPU_H
+#define CUTCP_CUTCP_CPU_H
 
 #include <vector>
 
@@ -20,4 +20,4 @@ namespace Cutcp
     );
 }
 
-#endif //CUTCP_CUTCP_H
+#endif //CUTCP_CUTCP_CPU_H

@@ -4,7 +4,7 @@
 #include <Atom/Atom.h>
 #include <Atom/Lattice.h>
 #include <Atom/Utils.h>
-#include <Cutcp/Cutcp.h>
+#include <Cutcp/CutcpCpu.h>
 #include <Cutcp/Utils.h>
 #include <Debug/Debug.h>
 

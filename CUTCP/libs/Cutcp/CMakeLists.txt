@@ -4,7 +4,7 @@ add_library(Cutcp_LIB)
 #Add executable
 target_sources(Cutcp_LIB
     PRIVATE
-        "src/Cutcp.cc"
+        "src/CutcpCpu.cc"
         "src/Utils.cc"
 )
 
