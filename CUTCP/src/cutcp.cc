@@ -42,8 +42,7 @@ int main(int argc, char *argv[])
     std::cout << "padding domain by " << padding << " Angstroms:" << std::endl;
     std::cout << "domain lenghts are " << maxCoords.x-minCoords.x << " by " << maxCoords.y-minCoords.y << " by " << maxCoords.z-minCoords.z << std::endl;
 
-    Lattice::LatticeDim latticeDim(minCoords, maxCoords, spacing);
-    Lattice::Lattice lattice(latticeDim);
+    Lattice::Lattice lattice(minCoords, maxCoords, spacing);
     
     Cutcp::CutoffPotential(lattice, cutoff, atoms);
     Debug::WriteLattice(vm["output-file"].as<std::string>(), lattice);

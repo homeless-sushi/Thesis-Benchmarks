@@ -13,9 +13,9 @@ namespace Cutcp
         Lattice::Lattice& lattice)
     {
         float *lattice_data = lattice.points.data();
-        int nx = lattice.dim.nx();
-        int ny = lattice.dim.ny();
-        int nz = lattice.dim.nz();
+        int nx = lattice.nx();
+        int ny = lattice.ny();
+        int nz = lattice.nz();
         const char* filename = fileURL.c_str();
 
         /* Open output file */

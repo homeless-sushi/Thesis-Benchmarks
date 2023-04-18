@@ -5,7 +5,6 @@ add_library(Atom_LIB)
 target_sources(Atom_LIB
     PRIVATE
         "src/Utils.cc"
-        "src/Lattice.cc"
 )
 
 #Add to the include path

@@ -20,13 +20,13 @@ namespace Cutcp
         std::vector<Atom::Atom>& atoms
     )
     {
-        const int nx = lattice.dim.nx();
-        const int ny = lattice.dim.ny();
-        const int nz = lattice.dim.nz();
-        const float minx = lattice.dim.min().x;
-        const float miny = lattice.dim.min().y;
-        const float minz = lattice.dim.min().z;
-        const float spacing = lattice.dim.spacing();
+        const int nx = lattice.nx();
+        const int ny = lattice.ny();
+        const int nz = lattice.nz();
+        const float minx = lattice.min().x;
+        const float miny = lattice.min().y;
+        const float minz = lattice.min().z;
+        const float spacing = lattice.spacing();
 
         const float cutSqrd = cutoff * cutoff;
         const float inverseCutSqrd = 1.f / cutSqrd;
@@ -129,13 +129,13 @@ namespace Cutcp
         std::vector<Atom::Atom>& atoms
     )
     {
-        const int nx = lattice.dim.nx();
-        const int ny = lattice.dim.ny();
-        const int nz = lattice.dim.nz();
-        const float minx = lattice.dim.min().x;
-        const float miny = lattice.dim.min().y;
-        const float minz = lattice.dim.min().z;
-        const float spacing = lattice.dim.spacing();
+        const int nx = lattice.nx();
+        const int ny = lattice.ny();
+        const int nz = lattice.nz();
+        const float minx = lattice.min().x;
+        const float miny = lattice.min().y;
+        const float minz = lattice.min().z;
+        const float spacing = lattice.spacing();
 
         const float cutSqrd = exclusionCutoff * exclusionCutoff;
         const float inverseSpacing = 1.f / spacing;
