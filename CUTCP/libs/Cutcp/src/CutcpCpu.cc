@@ -14,6 +14,8 @@
 
 namespace Cutcp
 {
+    
+
     void CutoffPotential(
         Lattice::Lattice& lattice, 
         float cutoff, 
