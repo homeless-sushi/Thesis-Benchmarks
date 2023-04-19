@@ -39,6 +39,7 @@ target_include_directories(CutcpAlgorithm
 add_subdirectory("libs/Atom")
 add_subdirectory("libs/Cutcp")
 add_subdirectory("libs/Debug")
+add_subdirectory("libs/Utils")
 target_link_libraries(CutcpAlgorithm
     PUBLIC
         Atom_LIB
