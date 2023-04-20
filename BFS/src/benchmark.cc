@@ -126,7 +126,6 @@ int main(int argc, char *argv[])
 
         margot::bfs::stop_monitors();
         margot::bfs::push_custom_monitor_values();
-        margot::bfs::log();
 
         //Add tick
         autosleep(data, targetThroughput);
