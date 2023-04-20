@@ -46,6 +46,12 @@ int main(int argc, char *argv[])
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
 
+    if (vm.count("help"))
+    {
+        std::cout << desc << "\n";
+        return 0;
+    }
+
     //Stop when Ctrl+C is called
     std::signal(SIGINT, [](int signal){
         if (signal == SIGINT) {
