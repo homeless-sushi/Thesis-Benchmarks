@@ -92,13 +92,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    while(!stop)
+    int error = 0;
+    while(!stop && !error)
     {
         //Read knobs
-        binarySemaphoreWait(dataSemId);
+        error = binarySemaphoreWait(dataSemId);
         cpuThreads = getNCpuCores(data);
         device = getUseGpu(data) ? BFS::Knobs::DEVICE::GPU : BFS::Knobs::DEVICE::CPU;
-        binarySemaphorePost(dataSemId);
+        error = binarySemaphorePost(dataSemId);
 
         deviceId = static_cast<unsigned int>(device);
         
@@ -135,9 +136,9 @@ int main(int argc, char *argv[])
 
         //Add tick
         autosleep(data, targetThroughput);
-        binarySemaphoreWait(dataSemId);
+        error = binarySemaphoreWait(dataSemId);
         addTick(data, 1);
-        binarySemaphorePost(dataSemId);
+        error = binarySemaphorePost(dataSemId);
     }
 
     //Detach from controller
