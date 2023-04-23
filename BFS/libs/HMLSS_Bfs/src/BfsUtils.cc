@@ -16,7 +16,7 @@ namespace BFSUtils
     {
 	    std::ofstream resultFile (fileURL);
         if (!resultFile.is_open()){
-            std::cout << "Error: Cannot open " << fileURL << std::endl;
+            std::cerr << "Error: Cannot open " << fileURL << std::endl;
             return -1;
         }
 

@@ -48,7 +48,7 @@ namespace GraphUtils
     {
 	    std::ofstream graphFile (fileURL);
         if (!graphFile.is_open()){
-            std::cout << "Error: Cannot open " << fileURL << std::endl;
+            std::cerr << "Error: Cannot open " << fileURL << std::endl;
             return -1;
         }
         
