@@ -27,6 +27,7 @@
 namespace po = boost::program_options;
 
 po::options_description SetupOptions();
+void SetupSignals();
 void CastKnobs(
     unsigned int gpuBlockSizeExp,
     unsigned int gpuChunkFactorExp,
@@ -52,13 +53,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    //Stop when Ctrl+C is called
-    std::signal(SIGINT, [](int signal){
-        if (signal == SIGINT) {
-            std::cout << std::endl << "Client stop" << std::endl;
-            stop = true;
-        }
-    });
+    SetupSignals();
 
     long double targetThroughput = vm["target-throughput"].as<long double>();
     //Attach to controller
@@ -157,6 +152,21 @@ po::options_description SetupOptions()
     ;
 
     return desc;
+}
+
+void SetupSignals()
+{
+    auto stopBenchmark = [](int signal){
+        std::cerr << std::endl;
+        std::cerr << "Received signal: " << signal << std::endl;
+        std::cerr << "Stopping benchmark" << std::endl;
+
+        stop = true;
+    };
+
+    std::signal(SIGINT, stopBenchmark);
+    std::signal(SIGTERM, stopBenchmark);
+
 }
 
 void CastKnobs(
