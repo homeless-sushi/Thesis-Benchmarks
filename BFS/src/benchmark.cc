@@ -21,6 +21,7 @@
 #include "AppRegisterCommon/Semaphore.h"
 
 #include "AppRegisterClient/AppRegister.h"
+#include "AppRegisterClient/Utils.h"
 
 #include <margot/margot.hpp>
 
@@ -43,6 +44,13 @@ bool stop = false;
 
 int main(int argc, char *argv[])
 {
+
+    std::cout << "EVENT,TYPE,DEVICE,TIMESTAMP" << std::endl;
+ 
+
+    //START: SETUP
+    std::cout << "SETUP,START,CPU," << now() << std::endl;
+    
     po::options_description desc(SetupOptions());
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -79,25 +87,39 @@ int main(int argc, char *argv[])
     BFS::GpuKnobs::MEMORY_TYPE gpuOffsetsMem;
     BFS::GpuKnobs::MEMORY_TYPE gpuEdgesMem;
 
+    std::cout << "SETUP,STOP,CPU," << now() << std::endl;
+    //STOP: SETUP
+
+
     //Spinlock
+    //START: WAIT REGISTRATION
+    std::cout << "WAIT REGISTRATION,START,CPU," << now() << std::endl;
     while(true){
         if(isRegistered(data)){
             setTickStartTime(data);
             break;
         }
     }
+    std::cout << "WAIT REGISTRATION,STOP,CPU," << now() << std::endl;
+    //STOP: WAIT REGISTRATION
+
 
     int error = 0;
     while(!stop && !error)
     {
         //Read knobs
+        //START: CONTROLLER PULL
+        std::cout << "CONTROLLER PULL,START,CPU," << now() << std::endl;
         error = binarySemaphoreWait(dataSemId);
         cpuThreads = getNCpuCores(data);
         device = getUseGpu(data) ? BFS::Knobs::DEVICE::GPU : BFS::Knobs::DEVICE::CPU;
         error = binarySemaphorePost(dataSemId);
-
         deviceId = static_cast<unsigned int>(device);
-        
+        std::cout << "CONTROLLER PULL,STOP,CPU," << now() << std::endl;
+        //STOP: CONTROLLER PULL
+
+        //START: MARGOT PULL
+        std::cout << "MARGOT PULL,START,CPU," << now() << std::endl;
         if(margot::bfs::update(cpuThreads, deviceId, gpuBlockSizeExp, gpuChunkFactorExp, gpuEdgesMemId, gpuOffsetsMemId)){
             CastKnobs(
                 gpuBlockSizeExp,
@@ -111,9 +133,12 @@ int main(int argc, char *argv[])
             );
             margot::bfs::context().manager.configuration_applied();
         }
-
+        std::cout << "MARGOT PULL,STOP,CPU," << now() << std::endl;
+        //STOP: MARGOT PULL
+ 
+        //START: WIND UP
+        std::cout << "WIND UP,START,CPU," << now() << std::endl;
         margot::bfs::start_monitors();
-
         Graph::Graph graph(GraphUtils::ReadGraphFile(vm["input-file"].as<std::string>()));
         std::unique_ptr<BFS::Knobs> knobs( 
             device == BFS::Knobs::DEVICE::GPU ?
@@ -121,19 +146,41 @@ int main(int argc, char *argv[])
             static_cast<BFS::Knobs*>(new BFS::CpuKnobs(cpuThreads))
         );
         std::unique_ptr<BFS::BfsResult> bfs(knobs->buildBfs(graph, 0));
+        std::cout << "WIND UP,STOP,CPU," << now() << std::endl;
+        //STOP: WIND UP
+
+        //START: KERNEL
+        std::cout << "KERNEL,START," << BFS::Knobs::ToString(device) << "," << now() << std::endl;
         while(!bfs->kernel()){}
+        std::cout << "KERNEL,STOP," << BFS::Knobs::ToString(device) << "," << now() << std::endl;
+        //STOP: KERNEL
+ 
+        //START: WIND DOWN
+        std::cout << "WIND DOWN,START,CPU," << now() << std::endl;
         if(vm.count("output-file")){
             BFSUtils::WriteGraphResultFile(vm["output-file"].as<std::string>(), *bfs);
         }
+        std::cout << "WIND DOWN,STOP,CPU," << now() << std::endl;
+        //START: WIND DOWN
 
+        //START: MARGOT PUSH
+        std::cout << "MARGOT PUSH,START,CPU," << now() << std::endl;
         margot::bfs::stop_monitors();
         margot::bfs::push_custom_monitor_values();
+        std::cout << "MARGOT PUSH,STOP,CPU," << now() << std::endl;
+        //STOP: MARGOT PUSH
+
 
         //Add tick
+        //START: CONTROLLER PUSH
+        std::cout << "CONTROLLER PUSH,START,CPU," << now() << std::endl;
         autosleep(data, targetThroughput);
         error = binarySemaphoreWait(dataSemId);
         addTick(data, 1);
         error = binarySemaphorePost(dataSemId);
+        std::cout << "CONTROLLER PUSH,STOP,CPU," << now() << std::endl;
+        //STOP: CONTROLLER PUSH
+
     }
 
     //Detach from controller
