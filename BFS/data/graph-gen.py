@@ -23,75 +23,92 @@ def main() :
 
     args = parser.parse_args()
     
-    outfile = args.outfile
+    outfileURL = args.outfile
+    outfile = open(outfileURL, 'w')
+
     n_vertices = args.vertex
+
     avg_degree = args.edge or np.floor(np.sqrt(n_vertices))
-    local = args.local
-    
     n_edges = 0
-    vertices = []
-    # the degree for the vertices is a truncated normal around the mean
-    rng_vertices_degrees = truncnorm(0, n_vertices, avg_degree, avg_degree/4)
+    degrees = []
     for vertex in range(n_vertices) :
-        vertex_degree = get_random_degree(rng_vertices_degrees, avg_degree)
+        vertex_degree = get_random_degree(avg_degree)
+        degrees.append(vertex_degree)
         n_edges+=vertex_degree
+
+    write_graph_info(outfile, n_vertices, n_edges)
+       
+    local = args.local
+    for vertex in range(n_vertices) :
+
+        vertex_degree = degrees[vertex]
+        n_edges+=vertex_degree
+
         rng_edges = np.random.default_rng()
         if local :
             vertex_edges = get_random_local_edges(rng_edges, vertex, vertex_degree, n_vertices)
         else :
             vertex_edges = get_random_edges(rng_edges, vertex, vertex_degree, n_vertices)
-        vertices.append(vertex_edges)
-    
-    write_graph_file(outfile, n_vertices, n_edges, vertices)
+
+        write_vertex_edges(outfile, vertex_edges)
+
+    outfile.close()
     
     return
 
-def get_random_degree(rng : np.random, mean: int) :
-    return int(np.trunc(truncnorm.rvs(-1,1,mean,mean/5)))
+def get_random_degree(mean: int) :
+    delta = int(np.trunc(np.sqrt(mean)))
+    low = mean - delta
+    high = mean + delta
+    return int(np.trunc(np.random.uniform(low, high)))
 
 def get_random_local_edges(rng : np.random, vertex: int, degree: int, n_vertices: int) :
-    edges = set()
-    edges.add(vertex)
-
     low = vertex - degree*2
     high = vertex + degree*2
+
     if(low < 0) :
         remaining = -low
         low = 0
         high += remaining
-    elif(high > n_vertices) :
+
+    if(high > n_vertices) :
         remaining = high - n_vertices
         high = n_vertices
-        low-=remaining
+        low -= remaining
     
-    while(len(edges) <= degree) :
-        edge = int(np.trunc(rng.uniform(low, high)))
-        edges.add(edge)
+    available = [x for x in range(low, high)]
+    available.remove(vertex)
 
-    edges.remove(vertex)
+    edges = []
+    while(len(edges) < degree) :
+        index = int(np.trunc(rng.uniform(0, len(available))))
+        edge = available[index]
+        available.pop(index)
+        edges.append(edge)
+
     return sorted(edges)
 
 
 def get_random_edges(rng : np.random, vertex: int, degree: int, n_vertices: int) :
-    edges = set()
-    edges.add(vertex)
-   
-    while(len(edges) <= degree) :
-        edge = int(np.trunc(rng.uniform(0, n_vertices)))
-        edges.add(edge)
+    available = [x for x in range(n_vertices)]
+    available.remove(vertex)
 
-    edges.remove(vertex)
+    edges = []
+    while(len(edges) < degree) :
+        index = int(np.trunc(rng.uniform(0, len(available))))
+        edge = available[index]
+        available.pop(index)
+        edges.append(edge)
+
     return sorted(edges)
 
-def write_graph_file(filename, n_vertices, n_edges, vertices) : 
-    file = open(filename, 'w')
+def write_graph_info(file, n_vertices, n_edges) :
     file.write(f"{n_vertices} {n_edges}\n")
-    for vs in vertices :
-        for v in vs :
-            file.write(f" {v}")
-        file.write("\n")
 
-    file.close()
+def write_vertex_edges(file, edges) :
+    for e in edges :
+        file.write(f" {e}")
+    file.write(f"\n")
     
 if __name__ == "__main__" :
     main()
